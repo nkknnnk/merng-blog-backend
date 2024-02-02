@@ -148,7 +148,7 @@ io.on("connection", (socket: any) => {
     }
   });
 });
-httpServer.listen(process.env.SOCKET_PORT, () => {
-  console.log("HTTPServer Socket Server Listing on Port: ", process.env.SOCKET_PORT)
-})
+// httpServer.listen(process.env.SOCKET_PORT, () => {
+//   console.log("HTTPServer Socket Server Listing on Port: ", process.env.SOCKET_PORT)
+// })
 module.exports = app
