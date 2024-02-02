@@ -4,9 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\" ",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\" ",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -22,12 +22,10 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@socket.io/admin-ui": "^0.5.1",
     "@tobyg74/tiktok-api-dl": "^1.0.13",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-graphql": "^0.12.0",
@@ -35,7 +33,6 @@
     "jsdom": "^24.0.0",
     "mongoose": "^7.5.3",
     "nayan-media-downloader": "^2.0.2",
-    "socket.io": "^4.7.4",
     "ytdl-core": "^4.11.5"
   }
 }
