@@ -29,9 +29,9 @@ const RootQuery = new GraphQLObjectType({
       args: {
         id: { type: GraphQLNonNull(GraphQLID) },
       },
-      async resolve(parent, {id}){
-        return User.findById(id).populate("blogs")
-      }
+      async resolve(parent, { id }) {
+        return User.findById(id).populate("blogs");
+      },
     },
     // get all Blog
     blogs: {
@@ -46,9 +46,9 @@ const RootQuery = new GraphQLObjectType({
       args: {
         id: { type: GraphQLNonNull(GraphQLID) },
       },
-      async resolve(parent, {id}){
-        return Blog.findById(id).populate("user comments")
-      }
+      async resolve(parent, { id }) {
+        return Blog.findById(id).populate("user comments");
+      },
     },
     // get all comments
     comments: {
@@ -177,15 +177,15 @@ const mutations = new GraphQLObjectType({
           session.startTransaction({ session });
           // @ts-ignore
           existingBlog = await Blog.findById(id).populate("user");
+          const FetchedBlog = await Blog.findById(id);
           // @ts-ignore
           const existingUser = existingBlog.user;
           if (!existingUser) return new Error("No user linked to this blog");
           if (!existingBlog) return new Error("Blog does not exist");
           existingUser.blogs.pull(existingBlog);
           await existingUser.save({ session });
-
-          // @ts-ignore
-          return await Blog.findOneAndDelete(id);
+          const deletedBlog = await Blog.deleteOne({_id: id});
+          return FetchedBlog;
         } catch (error) {
           // @ts-ignore
           return new Error(error);
