@@ -64,6 +64,7 @@ const mutations = new graphql_1.GraphQLObjectType({
             type: schema_1.UserType,
             args: {
                 name: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
+                username: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
                 email: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
                 password: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
             },
