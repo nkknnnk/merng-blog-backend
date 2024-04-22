@@ -33,8 +33,8 @@ const newUser = async (
     };
     const user = await User.create({
       name,
-      email: uuid(),
-      username,
+      email,
+      username:email,
       password,
       avatar,
     });
@@ -55,7 +55,7 @@ const login = async (
     const user = await User.findOne({ username }).select("+password");
     console.log(user);
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "User not Found" });
     }
     const isMatch = await compare(password, user.password);
     if (!isMatch) {
@@ -64,7 +64,7 @@ const login = async (
     sendToken(res, user, 200, `Welcome back ${user.username}`);
   } catch (error: any) {
     console.log(error.message);
-    return res.status(400).json({ message: "Invalid credentials" });
+    return res.status(500).json({ message: "Something went wrong! Please try again" });
   }
 };
 
@@ -92,8 +92,9 @@ const getMyProfile = async (
     const user = await User.findById(req.userId);
     return res.status(200).json({ success: true, data: user });
   } catch (error: any) {
+    console.log(error.message);
     // @ts-ignore
-    next(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 const logout = async (

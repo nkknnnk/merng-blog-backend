@@ -64,7 +64,7 @@ const mutations = new graphql_1.GraphQLObjectType({
             type: schema_1.UserType,
             args: {
                 name: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
-                username: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
+                // username: { type: GraphQLNonNull(GraphQLString) },
                 email: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
                 password: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLString) },
             },
@@ -119,24 +119,33 @@ const mutations = new graphql_1.GraphQLObjectType({
                 user: { type: (0, graphql_1.GraphQLNonNull)(graphql_1.GraphQLID) },
             },
             async resolve(parent, { title, content, date, user }) {
-                let blog;
                 const session = await (0, mongoose_1.startSession)();
                 try {
-                    session.startTransaction({ session });
-                    blog = new Blog_1.default({ title, content, date, user });
+                    session.startTransaction();
+                    const blog = new Blog_1.default({ title, content, date, user });
+                    // Check if the user exists
                     const existingUser = await User_1.default.findById(user);
-                    if (!existingUser)
-                        return new Error("User Not Found! Exiting");
+                    if (!existingUser) {
+                        throw new Error("User Not Found! Exiting");
+                    }
+                    // Push the new blog to the user's blogs array
                     existingUser.blogs.push(blog);
+                    // Save both the user and the blog within the same session
                     await existingUser.save({ session });
-                    return await blog.save({ session });
+                    await blog.save({ session });
+                    // Commit the transaction
+                    await session.commitTransaction();
+                    // End the session
+                    session.endSession();
+                    return blog;
                 }
                 catch (error) {
-                    // @ts-ignore
-                    return new Error(error);
-                }
-                finally {
-                    await session.commitTransaction();
+                    // Rollback the transaction in case of error
+                    await session.abortTransaction();
+                    // End the session
+                    session.endSession();
+                    // Throw the error
+                    throw error;
                 }
             },
         },

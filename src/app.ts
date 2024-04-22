@@ -30,7 +30,7 @@ const userSocketIDs = new Map();
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
-  cors: { origin: ["http://localhost:5173"], credentials: true },
+  cors: { origin: ["http://localhost:5173", "http://localhost:3000"], credentials: true },
 });
 app.set("io", io);
 
@@ -49,6 +49,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
+      "http://192.168.0.198:3000",
       "https://devnitish.com",
     ],
     credentials: true,
@@ -58,7 +59,7 @@ app.get("/", (req: any, res: any) => {
   console.log(req.body.username);
   res.json("Hello World!");
 });
-app.use("/graphql", graphqlHTTP({ schema, graphiql: true }));
+app.use("/api/v1/graphql", graphqlHTTP({ schema, graphiql: true }));
 app.use("/mediaapi", videoDownloader);
 
 // Set up the server to use the routes defined in /src/routes

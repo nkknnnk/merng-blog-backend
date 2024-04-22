@@ -11,7 +11,6 @@ const features_1 = require("../utils/features");
 const events_1 = require("../constants/events");
 const chat_1 = require("../models/chat");
 const helper_1 = require("../lib/helper");
-const uuid_1 = require("uuid");
 const newUser = async (req, res) => {
     const { name, username, password, email, bio } = req.body;
     console.log(req.body);
@@ -24,8 +23,8 @@ const newUser = async (req, res) => {
         };
         const user = await User_1.default.create({
             name,
-            email: (0, uuid_1.v4)(),
-            username,
+            email,
+            username: email,
             password,
             avatar,
         });
@@ -44,7 +43,7 @@ const login = async (req, res) => {
         const user = await User_1.default.findOne({ username }).select("+password");
         console.log(user);
         if (!user) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(400).json({ message: "User not Found" });
         }
         const isMatch = await (0, bcrypt_1.compare)(password, user.password);
         if (!isMatch) {
@@ -54,7 +53,7 @@ const login = async (req, res) => {
     }
     catch (error) {
         console.log(error.message);
-        return res.status(400).json({ message: "Invalid credentials" });
+        return res.status(500).json({ message: "Something went wrong! Please try again" });
     }
 };
 exports.login = login;
@@ -64,8 +63,9 @@ const getMyProfile = async (req, res) => {
         return res.status(200).json({ success: true, data: user });
     }
     catch (error) {
+        console.log(error.message);
         // @ts-ignore
-        next(error);
+        return res.status(500).json({ message: error.message });
     }
 };
 exports.getMyProfile = getMyProfile;

@@ -32,7 +32,7 @@ exports.userSocketIDs = userSocketIDs;
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(server, {
-    cors: { origin: ["http://localhost:5173"], credentials: true },
+    cors: { origin: ["http://localhost:5173", "http://localhost:3000"], credentials: true },
 });
 app.set("io", io);
 cloudinary_1.v2.config({
@@ -47,6 +47,7 @@ app.use((0, cors_1.default)({
     origin: [
         "http://localhost:5173",
         "http://localhost:3000",
+        "http://192.168.0.198:3000",
         "https://devnitish.com",
     ],
     credentials: true,
@@ -55,7 +56,7 @@ app.get("/", (req, res) => {
     console.log(req.body.username);
     res.json("Hello World!");
 });
-app.use("/graphql", (0, express_graphql_1.graphqlHTTP)({ schema: handlers_1.default, graphiql: true }));
+app.use("/api/v1/graphql", (0, express_graphql_1.graphqlHTTP)({ schema: handlers_1.default, graphiql: true }));
 app.use("/mediaapi", videoDownloader);
 // Set up the server to use the routes defined in /src/routes
 app.use("/api/v1/admin", admin_1.default);

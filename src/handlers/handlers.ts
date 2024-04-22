@@ -68,7 +68,7 @@ const mutations = new GraphQLObjectType({
       type: UserType,
       args: {
         name: { type: GraphQLNonNull(GraphQLString) },
-        username: { type: GraphQLNonNull(GraphQLString) },
+        // username: { type: GraphQLNonNull(GraphQLString) },
         email: { type: GraphQLNonNull(GraphQLString) },
         password: { type: GraphQLNonNull(GraphQLString) },
       },
@@ -122,24 +122,44 @@ const mutations = new GraphQLObjectType({
         user: { type: GraphQLNonNull(GraphQLID) },
       },
       async resolve(parent, { title, content, date, user }) {
-        let blog: Document<any, any, any>;
         const session = await startSession();
         try {
-          session.startTransaction({ session });
-          blog = new Blog({ title, content, date, user });
+          session.startTransaction();
+          const blog = new Blog({ title, content, date, user });
+
+          // Check if the user exists
           const existingUser = await User.findById(user);
-          if (!existingUser) return new Error("User Not Found! Exiting");
+          if (!existingUser) {
+            throw new Error("User Not Found! Exiting");
+          }
+
+          // Push the new blog to the user's blogs array
           existingUser.blogs.push(blog);
+
+          // Save both the user and the blog within the same session
           await existingUser.save({ session });
-          return await blog.save({ session });
-        } catch (error) {
-          // @ts-ignore
-          return new Error(error);
-        } finally {
+          await blog.save({ session });
+
+          // Commit the transaction
           await session.commitTransaction();
+
+          // End the session
+          session.endSession();
+
+          return blog;
+        } catch (error) {
+          // Rollback the transaction in case of error
+          await session.abortTransaction();
+
+          // End the session
+          session.endSession();
+
+          // Throw the error
+          throw error;
         }
       },
     },
+
     // update blog
     updateBlog: {
       type: BlogType,
@@ -185,7 +205,7 @@ const mutations = new GraphQLObjectType({
           if (!existingBlog) return new Error("Blog does not exist");
           existingUser.blogs.pull(existingBlog);
           await existingUser.save({ session });
-          const deletedBlog = await Blog.deleteOne({_id: id});
+          const deletedBlog = await Blog.deleteOne({ _id: id });
           return FetchedBlog;
         } catch (error) {
           // @ts-ignore
