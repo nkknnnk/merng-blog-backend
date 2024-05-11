@@ -13,16 +13,15 @@ import { getOtherMember } from "../lib/helper";
 import { Document } from "mongoose";
 import { v4 as uuid } from "uuid";
 
-
 const newUser = async (
   req: {
-    body: { name: any;email: string; username: any; password: any; bio: any };
+    body: { name: any; email: string; username: any; password: any; bio: any };
     file: any;
   },
   res: { status: any }
 ) => {
-  const { name, username, password,email, bio } = req.body;
-  console.log(req.body)
+  const { name, username, password, email, bio } = req.body;
+  console.log(req.body);
   try {
     const file = req.file;
 
@@ -34,11 +33,23 @@ const newUser = async (
     const user = await User.create({
       name,
       email,
-      username:email,
+      username: email,
       password,
       avatar,
     });
     return sendToken(res, user, 201, "User created successfully");
+  } catch (error: any) {
+    console.log(error.message);
+    return res.status(500).json({ message: error.message });
+  }
+};
+const getAllUsers = async (req: any, res: any) => {
+  try {
+    const users = await User.find().select(["-password", "-blogs", "-comments", "-__v", "-email", "-username"]);
+    return res.status(200).json({
+      success: true,
+      users: users.filter(user=>user?._id?.toString()!==req.userId),
+    });
   } catch (error: any) {
     console.log(error.message);
     return res.status(500).json({ message: error.message });
@@ -64,7 +75,9 @@ const login = async (
     sendToken(res, user, 200, `Welcome back ${user.username}`);
   } catch (error: any) {
     console.log(error.message);
-    return res.status(500).json({ message: "Something went wrong! Please try again" });
+    return res
+      .status(500)
+      .json({ message: "Something went wrong! Please try again" });
   }
 };
 
@@ -365,6 +378,7 @@ const getMyFriends = async (
 export {
   login,
   newUser,
+  getAllUsers,
   getMyProfile,
   logout,
   searchUser,

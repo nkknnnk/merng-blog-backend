@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMyFriends = exports.getAllNotifications = exports.acceptRequest = exports.sendRequest = exports.searchUser = exports.logout = exports.getMyProfile = exports.newUser = exports.login = void 0;
+exports.getMyFriends = exports.getAllNotifications = exports.acceptRequest = exports.sendRequest = exports.searchUser = exports.logout = exports.getMyProfile = exports.getAllUsers = exports.newUser = exports.login = void 0;
 const bcrypt_1 = require("bcrypt");
 const User_1 = __importDefault(require("../models/User"));
 const request_1 = require("../models/request");
@@ -36,6 +36,20 @@ const newUser = async (req, res) => {
     }
 };
 exports.newUser = newUser;
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User_1.default.find().select(["-password", "-blogs", "-comments", "-__v", "-email", "-username"]);
+        return res.status(200).json({
+            success: true,
+            users: users.filter(user => user?._id?.toString() !== req.userId),
+        });
+    }
+    catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message });
+    }
+};
+exports.getAllUsers = getAllUsers;
 // Log in a registered user and generate token
 const login = async (req, res) => {
     const { username, password } = req.body;
@@ -53,7 +67,9 @@ const login = async (req, res) => {
     }
     catch (error) {
         console.log(error.message);
-        return res.status(500).json({ message: "Something went wrong! Please try again" });
+        return res
+            .status(500)
+            .json({ message: "Something went wrong! Please try again" });
     }
 };
 exports.login = login;

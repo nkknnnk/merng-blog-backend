@@ -130,6 +130,7 @@ const mutations = new graphql_1.GraphQLObjectType({
                     }
                     // Push the new blog to the user's blogs array
                     existingUser.blogs.push(blog);
+                    console.log({ existingUser });
                     // Save both the user and the blog within the same session
                     await existingUser.save({ session });
                     await blog.save({ session });
@@ -141,6 +142,7 @@ const mutations = new graphql_1.GraphQLObjectType({
                 }
                 catch (error) {
                     // Rollback the transaction in case of error
+                    console.log(error.message);
                     await session.abortTransaction();
                     // End the session
                     session.endSession();

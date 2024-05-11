@@ -24,6 +24,13 @@ const message_1 = require("./models/message");
 const User_1 = __importDefault(require("./models/User"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const videoDownloader = require("./routes/videoDownloader");
+const origin = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://192.168.0.184:3000",
+    "http://192.168.0.195:3000",
+    "https://devnitish.com",
+];
 // Dotenv config
 (0, dotenv_1.config)();
 // active users
@@ -32,7 +39,7 @@ exports.userSocketIDs = userSocketIDs;
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(server, {
-    cors: { origin: ["http://localhost:5173", "http://localhost:3000"], credentials: true },
+    cors: { origin, credentials: true },
 });
 app.set("io", io);
 cloudinary_1.v2.config({
@@ -44,12 +51,7 @@ cloudinary_1.v2.config({
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)({
-    origin: [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "http://192.168.0.198:3000",
-        "https://devnitish.com",
-    ],
+    origin,
     credentials: true,
 }));
 app.get("/", (req, res) => {

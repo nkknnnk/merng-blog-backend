@@ -15,6 +15,7 @@ userRoutes.post("/new", multer_1.multerUpload.single("avatar"), user_1.newUser);
 userRoutes.post("/login", user_1.login); // Login with email and password to
 // After here user must be logged in to  access these routes
 userRoutes.use(auth_1.isAuthenticated);
+userRoutes.get("/allUsers", user_1.getAllUsers);
 userRoutes.get("/me", user_1.getMyProfile); // Get the profile of the authenticated
 userRoutes.get("/logout", user_1.logout);
 userRoutes.get("/search", user_1.searchUser);

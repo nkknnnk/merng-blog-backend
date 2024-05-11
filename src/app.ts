@@ -21,6 +21,13 @@ import jwt from "jsonwebtoken";
 
 const videoDownloader = require("./routes/videoDownloader");
 
+const origin = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://192.168.0.184:3000",
+  "http://192.168.0.195:3000",
+  "https://devnitish.com",
+]
 // Dotenv config
 config();
 
@@ -30,7 +37,7 @@ const userSocketIDs = new Map();
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
-  cors: { origin: ["http://localhost:5173", "http://localhost:3000"], credentials: true },
+  cors: { origin, credentials: true },
 });
 app.set("io", io);
 
@@ -46,12 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://192.168.0.198:3000",
-      "https://devnitish.com",
-    ],
+    origin,
     credentials: true,
   })
 );
